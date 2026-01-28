@@ -53,7 +53,10 @@ Create a `config.json` file with your dnsdist server configurations:
 - `name`: Unique identifier for the server
 - `address`: Server address in `host:port` format
 - `api_key`: API key for HMAC authentication (leave empty if authentication is not enabled)
-- `timeout`: Connection timeout in nanoseconds (default: 10000000000 = 10 seconds)
+- `timeout`: Connection timeout in nanoseconds (e.g., 10000000000 = 10 seconds). Note: Due to JSON limitations, this value must be specified in nanoseconds. Common values:
+  - 5 seconds = 5000000000
+  - 10 seconds = 10000000000
+  - 30 seconds = 30000000000
 
 ## Usage
 
@@ -168,8 +171,10 @@ go build -o dnsdist-worker ./cmd/dnsdist-worker
 
 - Always use API keys when connecting to dnsdist servers in production
 - Keep your API keys secure and never commit them to version control
+- Configuration files are saved with restrictive permissions (0600) to protect sensitive API keys
 - Use TLS/SSH tunneling for connections over untrusted networks
 - Limit access to the control socket using firewall rules
+- Ensure only trusted users have access to the configuration files
 
 ## License
 
