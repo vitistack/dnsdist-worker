@@ -1,0 +1,16 @@
+{
+  "servers": [
+    {
+      "name": "dnsdist-1",
+      "address": "127.0.0.1:5199",
+      "api_key": "your-api-key-here",
+      "timeout": 10000000000
+    },
+    {
+      "name": "dnsdist-2",
+      "address": "192.168.1.100:5199",
+      "api_key": "your-api-key-here",
+      "timeout": 10000000000
+    }
+  ]
+}

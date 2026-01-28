@@ -8,6 +8,9 @@
 *.so
 *.dylib
 
+# Built binary
+dnsdist-worker
+
 # Test binary, built with `go test -c`
 *.test
 
