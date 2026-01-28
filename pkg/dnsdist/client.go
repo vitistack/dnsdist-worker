@@ -17,6 +17,7 @@ type Client struct {
 	address string
 	apiKey  string
 	conn    net.Conn
+	reader  *bufio.Reader
 	timeout time.Duration
 }
 
@@ -41,12 +42,14 @@ func (c *Client) Connect() error {
 		return fmt.Errorf("failed to connect to %s: %w", c.address, err)
 	}
 	c.conn = conn
+	c.reader = bufio.NewReader(conn)
 
 	// Perform authentication if API key is provided
 	if c.apiKey != "" {
 		if err := c.authenticate(); err != nil {
 			c.conn.Close()
 			c.conn = nil
+			c.reader = nil
 			return fmt.Errorf("authentication failed: %w", err)
 		}
 	}
@@ -60,11 +63,9 @@ func (c *Client) authenticate() error {
 	if err := c.conn.SetReadDeadline(time.Now().Add(c.timeout)); err != nil {
 		return err
 	}
-
-	reader := bufio.NewReader(c.conn)
 	
 	// Read the challenge from the server
-	challenge, err := reader.ReadString('\n')
+	challenge, err := c.reader.ReadString('\n')
 	if err != nil {
 		return fmt.Errorf("failed to read challenge: %w", err)
 	}
@@ -116,11 +117,10 @@ func (c *Client) ExecuteCommand(command string) (string, error) {
 	}
 
 	// Read the response
-	reader := bufio.NewReader(c.conn)
 	var response strings.Builder
 	
 	for {
-		line, err := reader.ReadString('\n')
+		line, err := c.reader.ReadString('\n')
 		if err != nil {
 			if err == io.EOF {
 				break
@@ -149,6 +149,7 @@ func (c *Client) Close() error {
 	if c.conn != nil {
 		err := c.conn.Close()
 		c.conn = nil
+		c.reader = nil
 		return err
 	}
 	return nil

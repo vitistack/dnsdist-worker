@@ -24,8 +24,24 @@ func LoadConfig(filename string) (*Config, error) {
 		return nil, fmt.Errorf("failed to parse config file: %w", err)
 	}
 
-	// Set default timeout if not specified
+	// Validate and set defaults
+	seenNames := make(map[string]bool)
 	for i := range config.Servers {
+		// Validate required fields
+		if config.Servers[i].Name == "" {
+			return nil, fmt.Errorf("server at index %d has empty name", i)
+		}
+		if config.Servers[i].Address == "" {
+			return nil, fmt.Errorf("server '%s' has empty address", config.Servers[i].Name)
+		}
+
+		// Check for duplicate names
+		if seenNames[config.Servers[i].Name] {
+			return nil, fmt.Errorf("duplicate server name: %s", config.Servers[i].Name)
+		}
+		seenNames[config.Servers[i].Name] = true
+
+		// Set default timeout if not specified
 		if config.Servers[i].Timeout == 0 {
 			config.Servers[i].Timeout = 10 * time.Second
 		}
@@ -41,7 +57,8 @@ func SaveConfig(filename string, config *Config) error {
 		return fmt.Errorf("failed to marshal config: %w", err)
 	}
 
-	if err := os.WriteFile(filename, data, 0644); err != nil {
+	// Use restrictive permissions (0600) to protect sensitive API keys
+	if err := os.WriteFile(filename, data, 0600); err != nil {
 		return fmt.Errorf("failed to write config file: %w", err)
 	}
 

@@ -69,6 +69,10 @@ func main() {
 			}
 		}
 		connected := worker.GetConnectedServers()
+		if len(connected) == 0 {
+			fmt.Fprintf(os.Stderr, "Error: no servers connected successfully\n")
+			os.Exit(1)
+		}
 		fmt.Printf("Connected to %d server(s)\n", len(connected))
 	}
 

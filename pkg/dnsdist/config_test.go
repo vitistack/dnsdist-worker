@@ -2,6 +2,7 @@ package dnsdist
 
 import (
 	"os"
+	"strings"
 	"testing"
 	"time"
 )
@@ -113,6 +114,89 @@ func TestLoadConfigInvalidJSON(t *testing.T) {
 	_, err = LoadConfig(tmpFile.Name())
 	if err == nil {
 		t.Error("Expected error for invalid JSON")
+	}
+}
+
+func TestLoadConfigValidation(t *testing.T) {
+	tests := []struct {
+		name        string
+		config      string
+		expectError bool
+		errorMsg    string
+	}{
+		{
+			name: "empty server name",
+			config: `{
+				"servers": [
+					{
+						"address": "127.0.0.1:5199",
+						"api_key": "test-key"
+					}
+				]
+			}`,
+			expectError: true,
+			errorMsg:    "empty name",
+		},
+		{
+			name: "empty server address",
+			config: `{
+				"servers": [
+					{
+						"name": "test-server",
+						"api_key": "test-key"
+					}
+				]
+			}`,
+			expectError: true,
+			errorMsg:    "empty address",
+		},
+		{
+			name: "duplicate server names",
+			config: `{
+				"servers": [
+					{
+						"name": "test-server",
+						"address": "127.0.0.1:5199",
+						"api_key": "test-key"
+					},
+					{
+						"name": "test-server",
+						"address": "127.0.0.1:5200",
+						"api_key": "test-key"
+					}
+				]
+			}`,
+			expectError: true,
+			errorMsg:    "duplicate",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tmpFile, err := os.CreateTemp("", "config-*.json")
+			if err != nil {
+				t.Fatalf("Failed to create temp file: %v", err)
+			}
+			defer os.Remove(tmpFile.Name())
+
+			if _, err := tmpFile.Write([]byte(tt.config)); err != nil {
+				t.Fatalf("Failed to write config: %v", err)
+			}
+			tmpFile.Close()
+
+			_, err = LoadConfig(tmpFile.Name())
+			if tt.expectError {
+				if err == nil {
+					t.Errorf("Expected error containing '%s', got nil", tt.errorMsg)
+				} else if !strings.Contains(err.Error(), tt.errorMsg) {
+					t.Errorf("Expected error containing '%s', got: %v", tt.errorMsg, err)
+				}
+			} else {
+				if err != nil {
+					t.Errorf("Unexpected error: %v", err)
+				}
+			}
+		})
 	}
 }
 
