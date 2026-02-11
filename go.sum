@@ -1,0 +1,14 @@
+github.com/golang-jwt/jwt/v5 v5.3.1 h1:kYf81DTWFe7t+1VvL7eS+jKFVWaUnK9cB1qbwn63YCY=
+github.com/golang-jwt/jwt/v5 v5.3.1/go.mod h1:fxCRLWMO43lRc8nhHWY6LGqRcf+1gQWArsqaEUEa5bE=
+github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
+github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
+github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=
+github.com/joho/godotenv v1.5.1/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
+github.com/vitistack/gslb-operator v0.0.0-20260202124428-a9938d6cd745 h1:Rfdo96OunAf9ZBV0ylaSH15cJunhsV3kzGhm2zPZ9fQ=
+github.com/vitistack/gslb-operator v0.0.0-20260202124428-a9938d6cd745/go.mod h1:W5Hx2NyVuMy2MnbjIF38yGqT37LRV2J24KuU3MuybVE=
+github.com/vitistack/gslb-operator v0.0.0-20260204100337-db12d943c6a5 h1:6DLhkXKuXSnu5hg7Az3I16NKCSwrdKv1e7pXznF9ylE=
+github.com/vitistack/gslb-operator v0.0.0-20260204100337-db12d943c6a5/go.mod h1:j1BoF0YlG9SVXtYX1kW9t9pJUEOeX/Sbo6I9Ai9UMzU=
+golang.org/x/crypto v0.47.0 h1:V6e3FRj+n4dbpw86FJ8Fv7XVOql7TEwpHapKoMJ/GO8=
+golang.org/x/crypto v0.47.0/go.mod h1:ff3Y9VzzKbwSSEzWqJsJVBnWmRwRSHt/6Op5n9bQc4A=
+golang.org/x/sys v0.40.0 h1:DBZZqJ2Rkml6QMQsZywtnjnnGvHza6BTfYFWY9kjEWQ=
+golang.org/x/sys v0.40.0/go.mod h1:OgkHotnGiDImocRcuBABYBEXf8A9a87e/uXjp9XT3ks=

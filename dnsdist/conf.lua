@@ -1,0 +1,68 @@
+-- Enable console access with environment variable key
+local consoleKey = "M2YQKiPEDzeWHUFjejVOd+QHmMVmm2SuYG7vSXdaIkE="
+setKey(consoleKey)
+
+-- Disable security polling (optional, speeds up startup)
+setSecurityPollSuffix("")
+
+-- Enable web server for API access
+webserver("0.0.0.0:8083")
+setWebserverConfig({password="admin", apiKey="MySecretAPIKey123"})
+
+-- Enable control socket (for dnsdist -c)
+controlSocket("0.0.0.0:5199")
+setConsoleACL({'0.0.0.0/0', '::/0'})
+
+-- Bind UDP and TCP to port 53 for DNS queries
+addLocal("0.0.0.0:53", {reusePort=true})
+
+-- Set ACL to allow queries from other clients
+setACL({'0.0.0.0/0'})
+
+-- Add upstream DNS servers with health checks
+newServer({
+  address="8.8.8.8",
+  name="google-dns-1",
+  checkInterval=30,
+  checkTimeout=2,
+  maxCheckFailures=3
+})
+
+newServer({
+  address="1.1.1.1",
+  name="cloudflare-dns",
+  checkInterval=30,
+  checkTimeout=2,
+  maxCheckFailures=3
+})
+
+-- Enable verbose logging
+setVerboseHealthChecks(true)
+setVerbose(true)
+
+-- Simple load balancing policy
+setServerPolicy(roundrobin)
+
+-- Log queries
+addAction(AllRule(), LogAction("/var/log/dnsdist/queries.log", false, true, true))
+
+-- Register with dnsdist-worker
+local serverName = os.getenv("DNSDIST_SERVER_NAME") or "dnsdist-default"
+local serverHost = os.getenv("DNSDIST_HOST") or "127.0.0.1"
+local serverPort = "5199"
+local serviceUrl = os.getenv("DNSDIST_WORKER_URL") or "http://host.docker.internal:9000/dnsdist/ready"
+
+local jsonPayload = string.format([[{
+  "name": "%s",
+  "host": "%s",
+  "port": "%s",
+  "key": "%s"
+}]], serverName, serverHost, serverPort, consoleKey)
+
+local curlCmd = string.format([[curl -X POST "%s" \
+  -H "Content-Type: application/json" \
+  -d '%s']], serviceUrl, jsonPayload)
+
+print("Registering with dnsdist-worker...")
+print("Payload: " .. jsonPayload)
+os.execute(curlCmd)
